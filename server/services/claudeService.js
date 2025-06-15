@@ -14,7 +14,7 @@ class ClaudeService {
     - 正解
     - 解説
     
-    JSON形式で出力してください。
+    必ずダブルクォートのみを使った有効なJSON形式で、コードブロックやバッククォートを使わずに出力してください。
     `;
 
     const response = await anthropic.messages.create({
@@ -23,7 +23,10 @@ class ClaudeService {
       messages: [{ role: 'user', content: prompt }]
     });
 
-    return JSON.parse(response.content[0].text);
+    let text = response.content[0].text.trim();
+    // コードブロックやバッククォートを除去
+    text = text.replace(/^```json|```$/g, '').replace(/`/g, '');
+    return JSON.parse(text);
   }
 
   async generateProblem(userLevel, topic = null) {
@@ -31,23 +34,30 @@ class ClaudeService {
     SQLの${userLevel}レベルの学習者向けに実践的な問題を1つ作成してください。
     ${topic ? `テーマ: ${topic}` : ''}
     
-    以下の情報を含めてください：
-    - 問題の説明
-    - サンプルテーブル構造
-    - サンプルデータ
-    - 期待する結果の例
-    - ヒント（3段階）
+    以下の情報を必ず含めて、次のJSON形式で出力してください。
+    必ず全てのフィールドを埋めてください。
     
-    JSON形式で出力してください。
+    {
+      "title": "問題タイトル",
+      "description": "問題の説明",
+      "tableStructure": "テーブル構造（例: users(id INTEGER, name TEXT)）",
+      "sampleData": "サンプルデータ（例: 1,Taro\\n2,Hanako）",
+      "expectedResult": "期待される結果（例: id,name\\n1,Taro\\n2,Hanako）",
+      "hints": ["ヒント1", "ヒント2", "ヒント3"]
+    }
+    
+    必ずダブルクォートのみを使った有効なJSON形式で、コードブロックやバッククォートを使わずに出力してください。
     `;
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-sonnet-20240229',
-      max_tokens: 2000,
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
       messages: [{ role: 'user', content: prompt }]
     });
 
-    return JSON.parse(response.content[0].text);
+    let text = response.content[0].text.trim();
+    text = text.replace(/^```json|```$/g, '').replace(/`/g, '');
+    return JSON.parse(text);
   }
 
   async provideFeedback(userSQL, expectedResult, userLevel) {
@@ -70,16 +80,18 @@ class ClaudeService {
     5. 学習ポイント
 
     初心者にも分かりやすく、具体例を交えて説明してください。
-    JSON形式で出力してください。
+    必ずダブルクォートのみを使った有効なJSON形式で、コードブロックやバッククォートを使わずに出力してください。
     `;
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-sonnet-20240229',
-      max_tokens: 2500,
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
       messages: [{ role: 'user', content: prompt }]
     });
 
-    return JSON.parse(response.content[0].text);
+    let text = response.content[0].text.trim();
+    text = text.replace(/^```json|```$/g, '').replace(/`/g, '');
+    return JSON.parse(text);
   }
 }
 
