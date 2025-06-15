@@ -116,10 +116,22 @@ router.post('/submit', (req, res) => {
   // レベル判定（数値＋ラベル）
   let level = 0;
   let levelLabel = '';
-  if (advanced === 2) { level = 3; levelLabel = '上級'; }
-  else if (intermediate === 2) { level = 2; levelLabel = '中級'; }
-  else if (beginner >= 1) { level = 1; levelLabel = '初級'; }
-  else { level = 0; levelLabel = '未判定'; }
+  if (score === 0) {
+    level = 1;
+    levelLabel = '初級';
+  } else if (advanced === 2) {
+    level = 3;
+    levelLabel = '上級';
+  } else if (intermediate === 2) {
+    level = 2;
+    levelLabel = '中級';
+  } else if (beginner >= 1) {
+    level = 1;
+    levelLabel = '初級';
+  } else {
+    level = 0;
+    levelLabel = '未判定';
+  }
 
   res.json({
     score,

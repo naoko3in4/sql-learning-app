@@ -48,9 +48,9 @@ export const SQLEditor: React.FC<SQLEditorProps> = ({ expectedResult }) => {
           <h4>フィードバック</h4>
           <div className="syntax-check">
             <strong>構文チェック:</strong>
-            <p>{feedback.syntaxCheck}</p>
+            <p>{feedback.syntaxCheck || '構文チェック情報なし'}</p>
           </div>
-          {feedback.suggestions.length > 0 && (
+          {Array.isArray(feedback.suggestions) && feedback.suggestions.length > 0 && (
             <div className="suggestions">
               <strong>改善提案:</strong>
               <ul>

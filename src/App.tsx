@@ -33,6 +33,7 @@ const App: React.FC = () => {
     setUser(null);
     localStorage.removeItem('userId');
     localStorage.removeItem('userLevel');
+    localStorage.removeItem('lastAssessmentResult');
     setProceedToPractice(false);
   };
 
@@ -51,9 +52,18 @@ const App: React.FC = () => {
       {!user ? (
         <Login onLogin={handleLogin} />
       ) : user.level === null ? (
-        <LevelTest onLevelDecided={handleLevelUpdate} onProceedToPractice={() => setProceedToPractice(true)} />
+        <LevelTest onLevelDecided={handleLevelUpdate} />
       ) : !proceedToPractice ? (
-        <LevelTest onLevelDecided={handleLevelUpdate} onProceedToPractice={() => setProceedToPractice(true)} showResultOnly />
+        <div className="card">
+          <LevelTest onLevelDecided={handleLevelUpdate} showResultOnly />
+          <button
+            className="button"
+            style={{ marginTop: 24 }}
+            onClick={() => setProceedToPractice(true)}
+          >
+            練習問題に進む
+          </button>
+        </div>
       ) : (
         <ProblemGen />
       )}

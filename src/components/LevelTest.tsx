@@ -21,7 +21,11 @@ export const LevelTest: React.FC<LevelTestProps> = ({ onLevelDecided, onProceedT
     if (!showResultOnly) {
       loadQuestions();
     } else {
-      setShowResults(true);
+      const savedResult = localStorage.getItem('lastAssessmentResult');
+      if (savedResult) {
+        setResult(JSON.parse(savedResult));
+        setShowResults(true);
+      }
     }
   }, [showResultOnly]);
 
@@ -57,6 +61,7 @@ export const LevelTest: React.FC<LevelTestProps> = ({ onLevelDecided, onProceedT
       setResult(assessmentResult);
       setShowResults(true);
       localStorage.setItem('userLevel', assessmentResult.level.toString());
+      localStorage.setItem('lastAssessmentResult', JSON.stringify(assessmentResult));
       // サーバーにもレベルを反映
       const userId = localStorage.getItem('userId');
       if (userId && assessmentResult.level) {
@@ -68,20 +73,23 @@ export const LevelTest: React.FC<LevelTestProps> = ({ onLevelDecided, onProceedT
     }
   };
 
+  // showResultsの判定を修正
+  const shouldShowResults = (showResults && result) || (showResultOnly && result);
+
   if (loading && !showResultOnly) {
     return <div className="loading">問題を読み込み中...</div>;
   }
 
-  if (showResults && result) {
+  if (shouldShowResults) {
     return (
       <div className="card">
         <h2>評価結果</h2>
-        <p>スコア: {result.score}点</p>
-        <p>レベル: {result.levelLabel}</p>
-        <p>{result.feedback || result.message}</p>
+        <p>スコア: {result!.score}点</p>
+        <p>レベル: {result!.levelLabel}</p>
+        <p>{result!.feedback || result!.message}</p>
         <h3>各問題の正誤と解説</h3>
         <ul>
-          {result.details?.map((d, i) => (
+          {result!.details?.map((d, i) => (
             <li key={i} style={{ marginBottom: 8 }}>
               <strong>Q{i + 1}:</strong> {d.question}<br />
               あなたの回答: {d.userAnswer !== undefined && d.userAnswer !== null
