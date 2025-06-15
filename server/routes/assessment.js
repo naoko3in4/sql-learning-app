@@ -14,7 +14,8 @@ const sampleQuestions = [
       'FETCH * FROM users;',
       'SHOW ALL users;'
     ],
-    correctAnswer: 0
+    correctAnswer: 0,
+    explanation: 'SQLで全件取得はSELECT * FROM テーブル名; です。他の選択肢はSQLの構文ではありません。'
   },
   {
     id: 2,
@@ -25,7 +26,8 @@ const sampleQuestions = [
       'WHERE age > 20',
       'WHERE age =< 20'
     ],
-    correctAnswer: 0
+    correctAnswer: 0,
+    explanation: '>= は「以上」を表します。=> や =< はSQLの演算子として正しくありません。'
   },
   // --- 中級 ---
   {
@@ -37,7 +39,8 @@ const sampleQuestions = [
       'SELECT * FROM A, B;',
       'SELECT * FROM A CONNECT B;'
     ],
-    correctAnswer: 0
+    correctAnswer: 0,
+    explanation: 'INNER JOINを使い、ONで結合条件を指定します。他の選択肢は正しいSQL構文ではありません。'
   },
   {
     id: 4,
@@ -48,7 +51,8 @@ const sampleQuestions = [
       'SELECT SUM(amount) FROM sales GROUP BY date;',
       'SELECT date, amount FROM sales GROUP BY date;'
     ],
-    correctAnswer: 0
+    correctAnswer: 0,
+    explanation: 'GROUP BYで日付ごとに集計し、SUM関数で合計金額を求めます。GROUP BYがないと日付ごとの集計になりません。'
   },
   // --- 上級 ---
   {
@@ -60,7 +64,8 @@ const sampleQuestions = [
       'SELECT department, AVG(salary) FROM employees GROUP BY department WHERE AVG(salary) >= 300000;',
       'SELECT department, AVG(salary) FROM employees HAVING AVG(salary) >= 300000 GROUP BY department;'
     ],
-    correctAnswer: 0
+    correctAnswer: 0,
+    explanation: 'HAVING句はGROUP BYで集計した後の条件指定に使います。WHEREでAVG関数は使えません。'
   },
   {
     id: 6,
@@ -71,7 +76,8 @@ const sampleQuestions = [
       'SELECT RECURSIVE',
       'RECURSIVE WITH'
     ],
-    correctAnswer: 0
+    correctAnswer: 0,
+    explanation: '再帰クエリはWITH RECURSIVEで始めます。他の選択肢は正しい構文ではありません。'
   }
 ];
 
@@ -80,19 +86,48 @@ router.get('/questions', (req, res) => {
   res.json(sampleQuestions);
 });
 
-// ユーザーの回答を受け取り、正誤判定してスコアを返す
+// ユーザーの回答を受け取り、正誤判定してスコア・レベル・詳細を返す
 router.post('/submit', (req, res) => {
   const { answers } = req.body; // 例: [0, 2, ...]
   let score = 0;
+  let beginner = 0, intermediate = 0, advanced = 0;
+  const details = [];
+
   answers.forEach((ans, idx) => {
-    if (sampleQuestions[idx] && ans === sampleQuestions[idx].correctAnswer) {
+    const q = sampleQuestions[idx];
+    if (!q) return;
+    const isCorrect = ans === q.correctAnswer;
+    if (isCorrect) {
       score++;
+      if (idx < 2) beginner++;
+      else if (idx < 4) intermediate++;
+      else advanced++;
     }
+    details.push({
+      question: q.text,
+      userAnswer: ans,
+      isCorrect,
+      correctAnswer: q.correctAnswer,
+      correctAnswerText: q.options[q.correctAnswer],
+      explanation: q.explanation
+    });
   });
+
+  // レベル判定（数値＋ラベル）
+  let level = 0;
+  let levelLabel = '';
+  if (advanced === 2) { level = 3; levelLabel = '上級'; }
+  else if (intermediate === 2) { level = 2; levelLabel = '中級'; }
+  else if (beginner >= 1) { level = 1; levelLabel = '初級'; }
+  else { level = 0; levelLabel = '未判定'; }
+
   res.json({
     score,
     total: sampleQuestions.length,
-    message: `あなたのスコアは${score}点です` 
+    level,
+    levelLabel,
+    message: `あなたのスコアは${score}点です。あなたは${levelLabel}レベルです。`,
+    details
   });
 });
 

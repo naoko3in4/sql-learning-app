@@ -25,5 +25,16 @@ export interface Feedback {
 export interface AssessmentResult {
   score: number;
   level: number;
-  feedback: string;
+  levelLabel: string;
+  feedback?: string;
+  message?: string;
+  total?: number;
+  details?: {
+    question: string;
+    userAnswer: number | null;
+    isCorrect: boolean;
+    correctAnswer: number;
+    correctAnswerText: string;
+    explanation: string;
+  }[];
 } 

@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Question, AssessmentResult } from '../types';
 import { api } from '../services/api';
+import axios from 'axios';
 
-export const LevelTest: React.FC = () => {
+interface LevelTestProps {
+  onLevelDecided?: (level: number) => void;
+  onProceedToPractice?: () => void;
+  showResultOnly?: boolean;
+}
+
+export const LevelTest: React.FC<LevelTestProps> = ({ onLevelDecided, onProceedToPractice, showResultOnly }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
@@ -11,8 +18,12 @@ export const LevelTest: React.FC = () => {
   const [result, setResult] = useState<AssessmentResult | null>(null);
 
   useEffect(() => {
-    loadQuestions();
-  }, []);
+    if (!showResultOnly) {
+      loadQuestions();
+    } else {
+      setShowResults(true);
+    }
+  }, [showResultOnly]);
 
   const loadQuestions = async () => {
     try {
@@ -46,12 +57,18 @@ export const LevelTest: React.FC = () => {
       setResult(assessmentResult);
       setShowResults(true);
       localStorage.setItem('userLevel', assessmentResult.level.toString());
+      // サーバーにもレベルを反映
+      const userId = localStorage.getItem('userId');
+      if (userId && assessmentResult.level) {
+        await axios.post('/api/auth/update-level', { id: userId, level: assessmentResult.level });
+        if (onLevelDecided) onLevelDecided(assessmentResult.level);
+      }
     } catch (error) {
       console.error('評価の送信に失敗しました:', error);
     }
   };
 
-  if (loading) {
+  if (loading && !showResultOnly) {
     return <div className="loading">問題を読み込み中...</div>;
   }
 
@@ -60,13 +77,45 @@ export const LevelTest: React.FC = () => {
       <div className="card">
         <h2>評価結果</h2>
         <p>スコア: {result.score}点</p>
-        <p>レベル: {result.level}</p>
-        <p>{result.feedback}</p>
-        <button className="button" onClick={() => window.location.reload()}>
-          問題に戻る
-        </button>
+        <p>レベル: {result.levelLabel}</p>
+        <p>{result.feedback || result.message}</p>
+        <h3>各問題の正誤と解説</h3>
+        <ul>
+          {result.details?.map((d, i) => (
+            <li key={i} style={{ marginBottom: 8 }}>
+              <strong>Q{i + 1}:</strong> {d.question}<br />
+              あなたの回答: {d.userAnswer !== undefined && d.userAnswer !== null
+                ? `${d.userAnswer + 1}番`
+                : '未回答'}<br />
+              <span>正解: {d.correctAnswer !== undefined && d.correctAnswer !== null ? `${d.correctAnswer + 1}番` : ''}
+                {d.correctAnswerText ? `（${d.correctAnswerText}）` : ''}
+              </span><br />
+              {d.isCorrect ? (
+                <span style={{ color: 'green' }}>正解</span>
+              ) : (
+                <span style={{ color: 'red' }}>不正解</span>
+              )}
+              <br />
+              <span>解説: {d.explanation}</span>
+            </li>
+          ))}
+        </ul>
+        {onProceedToPractice && (
+          <button className="button" onClick={onProceedToPractice}>
+            OK（このレベルの練習問題に進む）
+          </button>
+        )}
+        {!onProceedToPractice && (
+          <button className="button" onClick={() => window.location.reload()}>
+            もう一度テストする
+          </button>
+        )}
       </div>
     );
+  }
+
+  if (showResultOnly) {
+    return null;
   }
 
   const currentQuestion = questions[currentQuestionIndex];
