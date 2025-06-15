@@ -5,6 +5,12 @@ const claudeService = require('../services/claudeService');
 // 問題の生成
 router.post('/generate', async (req, res) => {
   try {
+    if (process.env.USE_SAMPLE_PROBLEMS === 'true') {
+      const { userLevel } = req.body;
+      const level = parseInt(userLevel || '1');
+      const problem = sampleProblems.find(p => p.level === level) || sampleProblems[0];
+      return res.json(problem);
+    }
     const { userLevel, topic } = req.body;
     const problem = await claudeService.generateProblem(userLevel, topic);
     res.json(problem);

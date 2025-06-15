@@ -17,7 +17,7 @@ export const api = {
 
   // 問題生成関連
   getProblem: async (level: number): Promise<Problem> => {
-    const response = await axios.get(`${API_BASE_URL}/api/problems/generate?level=${level}`);
+    const response = await axios.post(`${API_BASE_URL}/api/problems/generate?level=${level}`);
     return response.data;
   },
 
