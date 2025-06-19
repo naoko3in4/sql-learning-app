@@ -27,13 +27,15 @@ router.post('/', async (req, res) => {
       return res.json(sampleFeedback);
     }
     const { sql, expectedResult } = req.body;
-    // 必要に応じてユーザーレベルも受け取る
     const userLevel = req.body.userLevel || 'beginner';
     const feedback = await claudeService.provideFeedback(sql, expectedResult, userLevel);
     res.json(feedback);
   } catch (error) {
     console.error('Feedback取得失敗:', error);
-    res.status(500).json({ error: 'フィードバックの取得に失敗しました' });
+    if (error.response) {
+      console.error('Claude response:', error.response.data);
+    }
+    res.status(500).json({ error: 'フィードバックの取得に失敗しました', details: error.message });
   }
 });
 
