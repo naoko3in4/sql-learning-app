@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Question, Problem, Feedback, AssessmentResult } from '../types';
+import { Question, Problem, Feedback, AssessmentResult, UserProgress, DailyProgress } from '../types';
 
 const API_BASE_URL = 'http://localhost:3001';
 
@@ -25,5 +25,15 @@ export const api = {
   getFeedback: async (sql: string, expectedResult: string): Promise<Feedback> => {
     const response = await axios.post(`${API_BASE_URL}/api/feedback`, { sql, expectedResult });
     return response.data;
+  },
+
+  // ユーザー進捗管理
+  getUserProgress: async (userId: string): Promise<UserProgress> => {
+    const response = await axios.get(`${API_BASE_URL}/api/progress/${userId}`);
+    return response.data;
+  },
+
+  saveDailyProgress: async (progress: DailyProgress): Promise<void> => {
+    await axios.post(`${API_BASE_URL}/api/progress/daily`, progress);
   }
 }; 

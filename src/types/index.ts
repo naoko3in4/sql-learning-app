@@ -20,6 +20,12 @@ export interface Feedback {
   syntaxCheck: string;
   suggestions: string[];
   improvedSQL?: string;
+  changes?: {
+    original: string;
+    improved: string;
+    reason: string;
+  }[];
+  learningPoints?: string[];
 }
 
 export interface AssessmentResult {
@@ -37,4 +43,25 @@ export interface AssessmentResult {
     correctAnswerText: string;
     explanation: string;
   }[];
+}
+
+export interface User {
+  id: number;
+  username: string;
+  level: number | null;
+}
+
+export interface UserProgress {
+  userId: string;
+  totalProblemsSolved: number;
+  currentScore: number;
+  lastSolvedDate?: string;
+  problemsSolvedToday: number;
+}
+
+export interface DailyProgress {
+  userId: string;
+  date: string;
+  problemsSolved: number;
+  score: number;
 } 

@@ -13,6 +13,7 @@ app.use('/api/assessment', require('./routes/assessment'));
 app.use('/api/problems', require('./routes/problems'));
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/progress', require('./routes/progress'));
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
