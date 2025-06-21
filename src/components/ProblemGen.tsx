@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Problem, UserProgress } from '../types';
+import { Problem } from '../types';
 import { api } from '../services/api';
 import { SQLEditor } from './SQLEditor';
 
@@ -10,7 +10,6 @@ export const ProblemGen: React.FC = () => {
   const [problemsSolved, setProblemsSolved] = useState(0);
   const [currentScore, setCurrentScore] = useState(0);
   const [showContinueModal, setShowContinueModal] = useState(false);
-  const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
 
   useEffect(() => {
     loadProblem();
@@ -34,7 +33,6 @@ export const ProblemGen: React.FC = () => {
       const userId = localStorage.getItem('userId');
       if (userId) {
         const progress = await api.getUserProgress(userId);
-        setUserProgress(progress);
         setProblemsSolved(progress.problemsSolvedToday);
         setCurrentScore(progress.currentScore);
       }
@@ -76,22 +74,6 @@ export const ProblemGen: React.FC = () => {
     setShowContinueModal(false);
     // ホーム画面に戻るなどの処理
     window.location.href = '/';
-  };
-
-  const saveProgress = async () => {
-    try {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        await api.saveDailyProgress({
-          userId,
-          date: new Date().toISOString().split('T')[0],
-          problemsSolved,
-          score: currentScore
-        });
-      }
-    } catch (error) {
-      console.error('進捗の保存に失敗しました:', error);
-    }
   };
 
   if (loading) {
@@ -147,6 +129,7 @@ export const ProblemGen: React.FC = () => {
 
       <SQLEditor 
         expectedResult={problem.expectedResult}
+        problemId={problem.id}
         onNextProblem={handleNextProblem}
         onProblemSolved={handleProblemSolved}
       />

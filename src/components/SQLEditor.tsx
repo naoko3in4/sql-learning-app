@@ -4,12 +4,14 @@ import { api } from '../services/api';
 
 interface SQLEditorProps {
   expectedResult: string;
+  problemId?: number;
   onNextProblem?: () => void;
   onProblemSolved?: (score: number) => void;
 }
 
 export const SQLEditor: React.FC<SQLEditorProps> = ({ 
   expectedResult, 
+  problemId,
   onNextProblem, 
   onProblemSolved 
 }) => {
@@ -23,7 +25,8 @@ export const SQLEditor: React.FC<SQLEditorProps> = ({
 
     setLoading(true);
     try {
-      const result = await api.getFeedback(sql, expectedResult);
+      const userId = localStorage.getItem('userId') || undefined;
+      const result = await api.getFeedback(sql, expectedResult, problemId, userId);
       setFeedback(result);
       setShowNextButton(true);
       // 問題解決時にスコアを通知（1点）

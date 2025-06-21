@@ -22,8 +22,13 @@ export const api = {
   },
 
   // SQLフィードバック関連
-  getFeedback: async (sql: string, expectedResult: string): Promise<Feedback> => {
-    const response = await axios.post(`${API_BASE_URL}/api/feedback`, { sql, expectedResult });
+  getFeedback: async (sql: string, expectedResult: string, problemId?: number, userId?: string): Promise<Feedback> => {
+    const response = await axios.post(`${API_BASE_URL}/api/feedback`, { 
+      sql, 
+      expectedResult, 
+      problemId, 
+      userId 
+    });
     return response.data;
   },
 
@@ -35,5 +40,17 @@ export const api = {
 
   saveDailyProgress: async (progress: DailyProgress): Promise<void> => {
     await axios.post(`${API_BASE_URL}/api/progress/daily`, progress);
+  },
+
+  // 回答履歴取得
+  getAnswerHistory: async (userId: string, limit: number = 10, offset: number = 0): Promise<any[]> => {
+    const response = await axios.get(`${API_BASE_URL}/api/feedback/history/${userId}?limit=${limit}&offset=${offset}`);
+    return response.data;
+  },
+
+  // 学習統計取得
+  getUserStats: async (userId: string): Promise<any> => {
+    const response = await axios.get(`${API_BASE_URL}/api/progress/stats/${userId}`);
+    return response.data;
   }
 }; 

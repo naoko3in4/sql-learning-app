@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { LevelTest } from './components/LevelTest';
 import { ProblemGen } from './components/ProblemGen';
 import { Login } from './components/Login';
