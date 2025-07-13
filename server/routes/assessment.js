@@ -125,7 +125,7 @@ router.post('/submit', (req, res) => {
   } else if (intermediate === 2) {
     level = 2;
     levelLabel = '中級';
-  } else if (beginner >= 1) {
+  } else if (score >= 1) {
     level = 1;
     levelLabel = '初級';
   } else {

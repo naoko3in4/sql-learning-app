@@ -1,7 +1,7 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -9,7 +9,7 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
@@ -41,7 +41,7 @@ code {
 }
 
 .button {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   border: none;
   color: white;
   padding: 10px 20px;
@@ -81,10 +81,10 @@ code {
 }
 
 .success {
-  color: #4CAF50;
+  color: #4caf50;
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid #4CAF50;
+  border: 1px solid #4caf50;
   border-radius: 4px;
   background-color: #f0fff0;
 }
@@ -178,7 +178,7 @@ code {
 
 .progress-info {
   background-color: #e8f5e8;
-  border: 1px solid #4CAF50;
+  border: 1px solid #4caf50;
   border-radius: 4px;
   padding: 10px;
   margin: 10px 0;
@@ -229,7 +229,7 @@ code {
 }
 
 .continue-modal-buttons .continue-btn {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
 }
 
@@ -238,7 +238,9 @@ code {
   color: white;
 }
 
-.syntax-check, .suggestions, .improved-sql {
+.syntax-check,
+.suggestions,
+.improved-sql {
   margin: 10px 0;
 }
 
@@ -255,4 +257,4 @@ pre {
   background-color: #fff3cd;
   border: 1px solid #ffeeba;
   border-radius: 4px;
-} 
+}

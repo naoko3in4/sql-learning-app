@@ -40,10 +40,10 @@ CREATE TABLE IF NOT EXISTS user_answers (
 
 CREATE TABLE IF NOT EXISTS user_progress (
   user_id INTEGER PRIMARY KEY,
-  total_problems_solved INTEGER DEFAULT 0,
+  total_problems_answered INTEGER DEFAULT 0,
+  total_problems_correct INTEGER DEFAULT 0,
   current_score INTEGER DEFAULT 0,
   last_solved_date TEXT,
-  problems_solved_today INTEGER DEFAULT 0,
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

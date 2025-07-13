@@ -53,10 +53,11 @@ export interface User {
 
 export interface UserProgress {
   userId: string;
-  totalProblemsSolved: number;
+  totalProblemsAnswered: number;
+  totalProblemsCorrect: number;
   currentScore: number;
   lastSolvedDate?: string;
-  problemsSolvedToday: number;
+  problemsAnsweredToday: number;
 }
 
 export interface DailyProgress {

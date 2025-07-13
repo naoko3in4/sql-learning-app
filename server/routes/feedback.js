@@ -60,34 +60,59 @@ const getSampleFeedback = (userSQL) => {
 // ユーザーの回答をDBに保存
 const saveUserAnswer = (userId, problemId, userSQL, feedback, expectedResult) => {
   try {
-    // 正解判定（簡易版：期待される結果とユーザーのSQLが一致するかチェック）
     const isCorrect = checkAnswer(userSQL, expectedResult);
-    
-    const stmt = db.prepare(`
-      INSERT INTO user_answers (
-        user_id, problem_id, user_sql, is_correct,
-        feedback_syntax_check, feedback_suggestions, feedback_improved_sql,
-        feedback_changes, feedback_learning_points, score
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    
-    const result = stmt.run(
-      userId,
-      problemId,
-      userSQL,
-      isCorrect ? 1 : 0,
-      feedback.syntaxCheck,
-      JSON.stringify(feedback.suggestions),
-      feedback.improvedSQL,
-      JSON.stringify(feedback.changes),
-      JSON.stringify(feedback.learningPoints),
-      isCorrect ? 1 : 0
-    );
+    const score = isCorrect ? 1 : 0; // 正解なら1点、不正解なら0点
+    const date = new Date().toISOString().split('T')[0];
 
-    // ユーザーの進捗を更新
-    updateUserProgress(userId, isCorrect ? 1 : 0);
-    
-    console.log('ユーザー回答を保存しました:', result.lastInsertRowid);
+    const transaction = db.transaction(() => {
+      // 1. user_answers に回答を保存
+      const stmt = db.prepare(`
+        INSERT INTO user_answers (
+          user_id, problem_id, user_sql, is_correct,
+          feedback_syntax_check, feedback_suggestions, feedback_improved_sql,
+          feedback_changes, feedback_learning_points, score
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      const info = stmt.run(
+        userId, problemId, userSQL, isCorrect ? 1 : 0,
+        feedback.syntaxCheck, JSON.stringify(feedback.suggestions),
+        feedback.improvedSQL, JSON.stringify(feedback.changes),
+        JSON.stringify(feedback.learningPoints), score
+      );
+      console.log('ユーザー回答を保存しました:', info.lastInsertRowid);
+
+      // 2. user_progress を更新
+      let progress = db.prepare('SELECT * FROM user_progress WHERE user_id = ?').get(userId);
+      if (!progress) {
+        db.prepare('INSERT INTO user_progress (user_id, total_problems_answered, total_problems_correct, current_score, last_solved_date) VALUES (?, 0, 0, 0, NULL)').run(userId);
+      }
+
+      const progressUpdateStmt = db.prepare(`
+        UPDATE user_progress
+        SET total_problems_answered = total_problems_answered + 1,
+            total_problems_correct = total_problems_correct + ?,
+            current_score = current_score + ?,
+            last_solved_date = ?
+        WHERE user_id = ?
+      `);
+      progressUpdateStmt.run(isCorrect ? 1 : 0, score, date, userId);
+
+      // 3. daily_progress を更新
+      let dailyProgress = db.prepare('SELECT * FROM daily_progress WHERE user_id = ? AND date = ?').get(userId, date);
+      if (!dailyProgress) {
+        db.prepare('INSERT INTO daily_progress (user_id, date, problems_solved, score) VALUES (?, ?, 0, 0)').run(userId, date);
+      }
+      const dailyUpdateStmt = db.prepare(`
+        UPDATE daily_progress
+        SET problems_solved = problems_solved + ?,
+            score = score + ?
+        WHERE user_id = ? AND date = ?
+      `);
+      dailyUpdateStmt.run(isCorrect ? 1 : 0, score, userId, date);
+    });
+
+    transaction();
+
   } catch (error) {
     console.error('ユーザー回答の保存に失敗:', error);
   }
@@ -100,47 +125,7 @@ const checkAnswer = (userSQL, expectedResult) => {
   return userSQL.trim().length > 0;
 };
 
-// ユーザーの進捗を更新
-const updateUserProgress = (userId, score) => {
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    
-    // ユーザーの総進捗を取得または作成
-    let progress = db.prepare('SELECT * FROM user_progress WHERE user_id = ?').get(userId);
-    
-    if (!progress) {
-      db.prepare('INSERT INTO user_progress (user_id, total_problems_solved, current_score) VALUES (?, 0, 0)').run(userId);
-      progress = { total_problems_solved: 0, current_score: 0, problems_solved_today: 0 };
-    }
-    
-    // 総進捗を更新
-    db.prepare(`
-      UPDATE user_progress 
-      SET total_problems_solved = total_problems_solved + 1,
-          current_score = current_score + ?,
-          last_solved_date = ?,
-          problems_solved_today = problems_solved_today + 1
-      WHERE user_id = ?
-    `).run(score, today, userId);
-    
-    // 日次進捗を更新
-    let dailyProgress = db.prepare('SELECT * FROM daily_progress WHERE user_id = ? AND date = ?').get(userId, today);
-    
-    if (!dailyProgress) {
-      db.prepare('INSERT INTO daily_progress (user_id, date, problems_solved, score) VALUES (?, ?, 0, 0)').run(userId, today);
-    }
-    
-    db.prepare(`
-      UPDATE daily_progress 
-      SET problems_solved = problems_solved + 1,
-          score = score + ?
-      WHERE user_id = ? AND date = ?
-    `).run(score, userId, today);
-    
-  } catch (error) {
-    console.error('ユーザー進捗の更新に失敗:', error);
-  }
-};
+
 
 router.post('/', async (req, res) => {
   try {

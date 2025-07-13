@@ -14,15 +14,21 @@ router.get('/:userId', (req, res) => {
     // ユーザーの総進捗を取得
     const totalProgress = db.prepare('SELECT * FROM user_progress WHERE user_id = ?').get(userId);
     
-    // 今日の進捗を取得
-    const todayProgress = db.prepare('SELECT * FROM daily_progress WHERE user_id = ? AND date = ?').get(userId, today);
-    
+    // 今日の回答数を取得
+    const today_string = new Date().toISOString().slice(0, 10);
+    const todayProgress = db.prepare(`
+      SELECT COUNT(*) as count 
+      FROM user_answers 
+      WHERE user_id = ? AND date(answered_at) = ?
+    `).get(userId, today_string);
+
     const progress = {
       userId,
-      totalProblemsSolved: totalProgress ? totalProgress.total_problems_solved : 0,
+      totalProblemsAnswered: totalProgress ? totalProgress.total_problems_answered : 0,
+      totalProblemsCorrect: totalProgress ? totalProgress.total_problems_correct : 0,
       currentScore: totalProgress ? totalProgress.current_score : 0,
       lastSolvedDate: totalProgress ? totalProgress.last_solved_date : null,
-      problemsSolvedToday: todayProgress ? todayProgress.problems_solved : 0
+      problemsAnsweredToday: todayProgress ? todayProgress.count : 0
     };
     
     res.json(progress);
@@ -32,52 +38,7 @@ router.get('/:userId', (req, res) => {
   }
 });
 
-// 日次進捗を保存
-router.post('/daily', (req, res) => {
-  try {
-    const { userId, date, problemsSolved, score } = req.body;
-    
-    // 日次進捗を保存または更新
-    const existingDaily = db.prepare('SELECT * FROM daily_progress WHERE user_id = ? AND date = ?').get(userId, date);
-    
-    if (existingDaily) {
-      db.prepare(`
-        UPDATE daily_progress 
-        SET problems_solved = ?, score = ?
-        WHERE user_id = ? AND date = ?
-      `).run(problemsSolved, score, userId, date);
-    } else {
-      db.prepare(`
-        INSERT INTO daily_progress (user_id, date, problems_solved, score)
-        VALUES (?, ?, ?, ?)
-      `).run(userId, date, problemsSolved, score);
-    }
-    
-    // ユーザーの総進捗を更新
-    const existingProgress = db.prepare('SELECT * FROM user_progress WHERE user_id = ?').get(userId);
-    
-    if (existingProgress) {
-      db.prepare(`
-        UPDATE user_progress 
-        SET total_problems_solved = total_problems_solved + ?,
-            current_score = current_score + ?,
-            last_solved_date = ?,
-            problems_solved_today = ?
-        WHERE user_id = ?
-      `).run(problemsSolved, score, date, problemsSolved, userId);
-    } else {
-      db.prepare(`
-        INSERT INTO user_progress (user_id, total_problems_solved, current_score, last_solved_date, problems_solved_today)
-        VALUES (?, ?, ?, ?, ?)
-      `).run(userId, problemsSolved, score, date, problemsSolved);
-    }
-    
-    res.json({ success: true });
-  } catch (error) {
-    console.error('進捗保存エラー:', error);
-    res.status(500).json({ error: '進捗の保存に失敗しました' });
-  }
-});
+
 
 // ユーザーの学習統計を取得
 router.get('/stats/:userId', (req, res) => {

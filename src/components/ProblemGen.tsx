@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Problem } from '../types';
+import { Problem, UserProgress } from '../types';
 import { api } from '../services/api';
 import { SQLEditor } from './SQLEditor';
 
-export const ProblemGen: React.FC = () => {
+interface ProblemGenProps {
+  userProgress: UserProgress | null;
+  onProgressUpdate: () => void;
+}
+
+export const ProblemGen: React.FC<ProblemGenProps> = ({ userProgress, onProgressUpdate }) => {
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentHintIndex, setCurrentHintIndex] = useState(-1);
-  const [problemsSolved, setProblemsSolved] = useState(0);
-  const [currentScore, setCurrentScore] = useState(0);
   const [showContinueModal, setShowContinueModal] = useState(false);
 
   useEffect(() => {
     loadProblem();
-    loadUserProgress();
   }, []);
 
   const loadProblem = async () => {
+    setLoading(true);
     try {
       const userLevel = parseInt(localStorage.getItem('userLevel') || '1');
       const newProblem = await api.getProblem(userLevel);
@@ -28,34 +31,16 @@ export const ProblemGen: React.FC = () => {
     }
   };
 
-  const loadUserProgress = async () => {
-    try {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        const progress = await api.getUserProgress(userId);
-        setProblemsSolved(progress.problemsSolvedToday);
-        setCurrentScore(progress.currentScore);
-      }
-    } catch (error) {
-      console.error('ユーザー進捗の読み込みに失敗しました:', error);
-    }
-  };
-
   const showNextHint = () => {
     if (problem && currentHintIndex < problem.hints.length - 1) {
       setCurrentHintIndex(currentHintIndex + 1);
     }
   };
 
-  const handleProblemSolved = (score: number) => {
-    const newProblemsSolved = problemsSolved + 1;
-    const newScore = currentScore + score;
-    
-    setProblemsSolved(newProblemsSolved);
-    setCurrentScore(newScore);
-
-    // 3問回答後に継続確認モーダルを表示
-    if (newProblemsSolved >= 3) {
+  const handleProblemSolved = () => {
+    onProgressUpdate(); // App.tsx に進捗更新を通知
+    // 3問回答ごとにモーダルを出すロジックは、userProgress.problemsAnsweredToday を使う
+    if (userProgress && (userProgress.problemsAnsweredToday + 1) % 3 === 0) {
       setShowContinueModal(true);
     }
   };
@@ -72,7 +57,6 @@ export const ProblemGen: React.FC = () => {
 
   const handleStop = () => {
     setShowContinueModal(false);
-    // ホーム画面に戻るなどの処理
     window.location.href = '/';
   };
 
@@ -86,10 +70,9 @@ export const ProblemGen: React.FC = () => {
 
   return (
     <div className="card">
-      {/* 進捗情報表示 */}
       <div className="progress-info">
         <div className="score">
-          本日の進捗: {problemsSolved}問回答済み / スコア: {currentScore}点
+          本日の進捗: {userProgress ? userProgress.problemsAnsweredToday : 0}問回答済み / スコア: {userProgress ? userProgress.currentScore : 0}点
         </div>
       </div>
 
@@ -131,15 +114,15 @@ export const ProblemGen: React.FC = () => {
         expectedResult={problem.expectedResult}
         problemId={problem.id}
         onNextProblem={handleNextProblem}
-        onProblemSolved={handleProblemSolved}
+        onProblemSolved={handleProblemSolved} // handleProblemSolved を渡す
+        userProgress={userProgress} // userProgress を渡す
       />
 
-      {/* 継続確認モーダル */}
       {showContinueModal && (
         <div className="continue-modal">
           <div className="continue-modal-content">
             <h3>本日分は終了しました</h3>
-            <p>本日は{problemsSolved}問回答し、{currentScore}点を獲得しました。</p>
+            <p>本日は{userProgress?.problemsAnsweredToday}問回答し、{userProgress?.currentScore}点を獲得しました。</p>
             <p>続けますか？</p>
             <div className="continue-modal-buttons">
               <button className="continue-btn" onClick={handleContinue}>

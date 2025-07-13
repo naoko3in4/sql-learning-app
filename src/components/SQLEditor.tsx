@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import { Feedback } from '../types';
+import { Feedback, UserProgress } from '../types';
 import { api } from '../services/api';
 
 interface SQLEditorProps {
   expectedResult: string;
   problemId?: number;
   onNextProblem?: () => void;
-  onProblemSolved?: (score: number) => void;
+  onProblemSolved?: () => void; // 引数なしに変更
+  userProgress: UserProgress | null;
 }
 
 export const SQLEditor: React.FC<SQLEditorProps> = ({ 
   expectedResult, 
   problemId,
   onNextProblem, 
-  onProblemSolved 
+  onProblemSolved,
+  userProgress
 }) => {
   const [sql, setSql] = useState('');
   const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -29,9 +31,8 @@ export const SQLEditor: React.FC<SQLEditorProps> = ({
       const result = await api.getFeedback(sql, expectedResult, problemId, userId);
       setFeedback(result);
       setShowNextButton(true);
-      // 問題解決時にスコアを通知（1点）
       if (onProblemSolved) {
-        onProblemSolved(1);
+        onProblemSolved(); // 進捗更新を通知
       }
     } catch (error) {
       console.error('フィードバックの取得に失敗しました:', error);
@@ -51,6 +52,19 @@ export const SQLEditor: React.FC<SQLEditorProps> = ({
 
   return (
     <div className="card">
+      <div className="score-display" style={{ marginBottom: '15px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
+        <h4>総合スコア</h4>
+        {userProgress ? (
+          <p>
+            正解数 / 回答数: <strong>{userProgress.totalProblemsCorrect}</strong> / <strong>{userProgress.totalProblemsAnswered}</strong>
+            <br />
+            正解率: <strong>{userProgress.totalProblemsAnswered > 0 ? ((userProgress.totalProblemsCorrect / userProgress.totalProblemsAnswered) * 100).toFixed(1) : 0} %</strong>
+          </p>
+        ) : (
+          <p>スコア情報を読み込んでいます...</p>
+        )}
+      </div>
+
       <h3>SQLエディター</h3>
       <textarea
         value={sql}

@@ -38,9 +38,7 @@ export const api = {
     return response.data;
   },
 
-  saveDailyProgress: async (progress: DailyProgress): Promise<void> => {
-    await axios.post(`${API_BASE_URL}/api/progress/daily`, progress);
-  },
+  
 
   // 回答履歴取得
   getAnswerHistory: async (userId: string, limit: number = 10, offset: number = 0): Promise<any[]> => {
