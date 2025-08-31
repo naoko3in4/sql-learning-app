@@ -259,4 +259,382 @@ pre {
   border-radius: 4px;
 }
 
+/* ダッシュボード用スタイル */
+
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard h1 {
+  color: #333;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* 統計情報セクション */
+.stats-section {
+  margin-bottom: 40px;
+}
+
+.stats-section h2 {
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #4caf50;
+  padding-bottom: 10px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border-left: 4px solid #4caf50;
+}
+
+.stat-card h3 {
+  margin: 0 0 10px 0;
+  color: #666;
+  font-size: 0.9em;
+  text-transform: uppercase;
+}
+
+.stat-number {
+  font-size: 2em;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+/* レベル別統計 */
+.level-stats {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.level-stats h3 {
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.level-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.level-stat-card {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+  text-align: center;
+}
+
+.level-stat-card h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.level-stat-card p {
+  margin: 5px 0;
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* 解答履歴セクション */
+.history-section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.history-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+}
+
+.level-filter {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 14px;
+}
+
+/* 解答履歴リスト */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.answer-card {
+  border: 1px solid #eee;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.answer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.answer-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.answer-info h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1em;
+}
+
+.level-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: bold;
+  color: white;
+}
+
+.level-1 { background-color: #28a745; }
+.level-2 { background-color: #ffc107; }
+.level-3 { background-color: #dc3545; }
+
+.result-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: bold;
+  color: white;
+}
+
+.result-badge.correct {
+  background-color: #28a745;
+}
+
+.result-badge.incorrect {
+  background-color: #dc3545;
+}
+
+.date {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.expand-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s;
+}
+
+.expand-btn:hover {
+  background: #0056b3;
+}
+
+/* 解答詳細 */
+.answer-details {
+  padding: 20px;
+  background: white;
+}
+
+.answer-details h4 {
+  color: #333;
+  margin: 20px 0 10px 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.answer-details h4:first-child {
+  margin-top: 0;
+}
+
+.problem-info p {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.code-block {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  margin: 10px 0;
+}
+
+.code-block.correct {
+  border-left: 4px solid #28a745;
+  background: #f8fff8;
+}
+
+.code-block.incorrect {
+  border-left: 4px solid #dc3545;
+  background: #fff8f8;
+}
+
+.user-answer {
+  margin: 20px 0;
+}
+
+.feedback {
+  margin: 20px 0;
+}
+
+.feedback-section {
+  margin: 15px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.feedback-section h5 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 1em;
+}
+
+.feedback-section p {
+  margin: 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.feedback-section ul {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.feedback-section li {
+  margin: 5px 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* ページネーション */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 30px;
+  padding: 20px 0;
+  border-top: 1px solid #eee;
+}
+
+.page-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.page-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.page-info {
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* アクティブボタン */
+.button.active {
+  background-color: #0056b3;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+  }
+  
+  .level-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+  
+  .answer-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .answer-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.no-data {
+  text-align: center;
+  color: #666;
+  padding: 40px;
+  font-style: italic;
+}
+
 

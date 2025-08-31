@@ -53,5 +53,28 @@ export const api = {
   getUserStats: async (userId: string): Promise<any> => {
     const response = await axios.get(`${API_BASE_URL}/api/progress/stats/${userId}`);
     return response.data;
+  },
+
+  // ダッシュボード関連
+  getDashboardStats: async (userId: string): Promise<any> => {
+    const response = await axios.get(`${API_BASE_URL}/api/dashboard/stats/${userId}`);
+    return response.data;
+  },
+
+  getDashboardHistory: async (userId: string, page: number = 1, limit: number = 20, level?: number): Promise<any> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    });
+    if (level) {
+      params.append('level', level.toString());
+    }
+    const response = await axios.get(`${API_BASE_URL}/api/dashboard/history/${userId}?${params}`);
+    return response.data;
+  },
+
+  getRecentAnswers: async (userId: string): Promise<any[]> => {
+    const response = await axios.get(`${API_BASE_URL}/api/dashboard/recent/${userId}`);
+    return response.data;
   }
 }; 
