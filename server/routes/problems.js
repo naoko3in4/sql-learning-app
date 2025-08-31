@@ -46,9 +46,22 @@ const getProblemFromDB = (problemId) => {
   return null;
 };
 
-// ランダムな問題をDBから取得
-const getRandomProblemFromDB = (level) => {
-  const problem = db.prepare('SELECT * FROM problems WHERE level = ? ORDER BY RANDOM() LIMIT 1').get(level);
+// ランダムな問題をDBから取得（ユーザーが過去24時間以内に解いていない問題、かつ正解済みでない問題のみ）
+const getRandomProblemFromDB = (level, userId) => {
+  // 過去24時間以内に解いた問題と正解済みの問題を除外
+  const problem = db.prepare(`
+    SELECT p.* FROM problems p 
+    WHERE p.level = ? 
+    AND p.id NOT IN (
+      SELECT ua.problem_id 
+      FROM user_answers ua 
+      WHERE ua.user_id = ? 
+      AND (ua.answered_at > datetime('now', '-1 day') OR ua.is_correct = 1)
+    )
+    ORDER BY RANDOM() 
+    LIMIT 1
+  `).get(level, userId);
+  
   if (problem) {
     return {
       id: problem.id,
@@ -77,8 +90,12 @@ const getRandomSampleProblem = (level) => {
 // 問題生成（環境変数に応じてサンプル問題またはClaude APIを使用）
 router.post('/generate', async (req, res) => {
   try {
-    const { level = 1 } = req.query;
+    const { level = 1, userId } = req.body;
     const userLevel = parseInt(level);
+
+    if (!userId) {
+      return res.status(400).json({ error: 'ユーザーIDが必要です' });
+    }
 
     let problem;
 
@@ -88,7 +105,7 @@ router.post('/generate', async (req, res) => {
       problem = getRandomSampleProblem(userLevel);
       
       // DBに保存（まだ保存されていない場合）
-      const existingProblem = getRandomProblemFromDB(userLevel);
+      const existingProblem = getRandomProblemFromDB(userLevel, userId);
       if (!existingProblem) {
         const problemId = saveProblemToDB(problem);
         problem.id = problemId;
@@ -99,10 +116,39 @@ router.post('/generate', async (req, res) => {
       // Claude APIを使用
       console.log('Claude APIを使用します');
       
-      // まずDBからランダムな問題を取得
-      problem = getRandomProblemFromDB(userLevel);
+      // まずDBからランダムな問題を取得（過去24時間以内に解いていない問題のみ）
+      problem = getRandomProblemFromDB(userLevel, userId);
 
-      // DBに問題がない場合は、Claudeで問題を生成
+      // 過去24時間以内に解いていない問題がない場合は、過去48時間以内に解いていない問題を探す（正解済みは除外）
+      if (!problem) {
+        const problem48h = db.prepare(`
+          SELECT p.* FROM problems p 
+          WHERE p.level = ? 
+          AND p.id NOT IN (
+            SELECT ua.problem_id 
+            FROM user_answers ua 
+            WHERE ua.user_id = ? 
+            AND (ua.answered_at > datetime('now', '-2 days') OR ua.is_correct = 1)
+          )
+          ORDER BY RANDOM() 
+          LIMIT 1
+        `).get(userLevel, userId);
+        
+        if (problem48h) {
+          problem = {
+            id: problem48h.id,
+            title: problem48h.title,
+            description: problem48h.description,
+            tableStructure: problem48h.table_structure,
+            sampleData: problem48h.sample_data,
+            expectedResult: problem48h.expected_result,
+            hints: JSON.parse(problem48h.hints),
+            level: problem48h.level
+          };
+        }
+      }
+
+      // それでも問題がない場合は、新しい問題を生成
       if (!problem) {
         try {
           const generatedProblem = await claudeService.generateProblem(userLevel);

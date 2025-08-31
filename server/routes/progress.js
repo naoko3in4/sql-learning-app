@@ -38,8 +38,6 @@ router.get('/:userId', (req, res) => {
   }
 });
 
-
-
 // ユーザーの学習統計を取得
 router.get('/stats/:userId', (req, res) => {
   try {

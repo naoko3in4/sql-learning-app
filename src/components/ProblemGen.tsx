@@ -22,7 +22,13 @@ export const ProblemGen: React.FC<ProblemGenProps> = ({ userProgress, onProgress
     setLoading(true);
     try {
       const userLevel = parseInt(localStorage.getItem('userLevel') || '1');
-      const newProblem = await api.getProblem(userLevel);
+      const userId = localStorage.getItem('userId');
+      
+      if (!userId) {
+        throw new Error('ユーザーIDが見つかりません');
+      }
+      
+      const newProblem = await api.getProblem(userLevel, userId);
       setProblem(newProblem);
     } catch (error) {
       console.error('問題の読み込みに失敗しました:', error);
