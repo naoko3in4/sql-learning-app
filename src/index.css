@@ -183,18 +183,19 @@ code {
 }
 
 .progress-info {
-  background-color: #e8f5e8;
-  border: 1px solid #4caf50;
-  border-radius: 4px;
-  padding: 10px;
+  background: linear-gradient(135deg, #e8f8f5 0%, #d1f2eb 100%);
+  border: 1px solid #00b894;
+  border-radius: 8px;
+  padding: 12px;
   margin: 10px 0;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 184, 148, 0.1);
 }
 
 .progress-info .score {
   font-size: 1.2em;
   font-weight: bold;
-  color: #2e7d32;
+  color: #00b894;
 }
 
 .continue-modal {
