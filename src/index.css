@@ -675,6 +675,32 @@ pre {
     flex-direction: column;
     gap: 10px;
   }
+  
+  /* ナビゲーションボタンのレスポンシブ対応 */
+  .button-text {
+    display: none;
+  }
+  
+  .button-icon {
+    display: inline-block;
+    font-size: 1.2em;
+  }
+  
+  .button {
+    min-width: 44px;
+    padding: 10px 12px;
+  }
+}
+
+/* デスクトップ表示用 */
+@media (min-width: 769px) {
+  .button-text {
+    display: inline-block;
+  }
+  
+  .button-icon {
+    display: none;
+  }
 }
 
 .no-data {

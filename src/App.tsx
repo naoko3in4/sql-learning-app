@@ -95,8 +95,17 @@ const App: React.FC = () => {
                 setProceedToPractice(true);
                 localStorage.setItem('currentView', 'practice');
               }}
+              title="練習問題"
             >
-              練習問題
+              <span className="button-text">練習問題</span>
+              <span className="button-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13 3L5 11L3 9L11 1L13 3Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <path d="M5 11L3 13" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M14 4L12 2" stroke="currentColor" strokeWidth="1.5"/>
+                  <circle cx="12" cy="3" r="1" fill="currentColor"/>
+                </svg>
+              </span>
             </button>
             <button 
               className={`button ${currentView === 'dashboard' ? 'active' : ''}`}
@@ -106,10 +115,32 @@ const App: React.FC = () => {
                 setProceedToPractice(true);
                 localStorage.setItem('currentView', 'dashboard');
               }}
+              title="ダッシュボード"
             >
-              ダッシュボード
+              <span className="button-text">ダッシュボード</span>
+              <span className="button-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="2" width="5" height="5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <rect x="9" y="2" width="5" height="5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <rect x="2" y="9" width="5" height="5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <rect x="9" y="9" width="5" height="5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                </svg>
+              </span>
             </button>
-            <button className="button" onClick={handleLogout}>ログアウト</button>
+            <button 
+              className="button" 
+              onClick={handleLogout}
+              title="ログアウト"
+            >
+              <span className="button-text">ログアウト</span>
+              <span className="button-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="2" width="8" height="12" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <path d="M12 6L14 8L12 10" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <path d="M10 8H14" stroke="currentColor" strokeWidth="1.5"/>
+                </svg>
+              </span>
+            </button>
           </div>
         </div>
       )}
